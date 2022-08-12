@@ -1,14 +1,14 @@
 import './App.css';
 import {useEffect, useRef, useState} from "react";
+import axios from "axios";
 
 import Input from "./components/Input";
 import InputUser from "./components/InputUser";
 import ListUser from "./components/ListUser";
-// import data from "./database/data.json"
+import data from "./database/data.json";
 import Storage from "./components/storage";
-import axios from "axios";
 import {axiosData, fetchData} from "./components/GetUsers";
-
+import UpdateUser from "./components/UpdateUser"
 
 function App() {
 
@@ -22,9 +22,9 @@ function App() {
         //     .then(data => setUsers(data))
 
         // axiosData
-        const data = axiosData();
-        data
-          .then(response => setUsers(response.data))
+        // const data = axiosData();
+        // data
+        //   .then(response => setUsers(response.data))
     }, []);
 
 
@@ -45,8 +45,8 @@ function App() {
     //     .then(response => response.data)
 
 
-    const [users, setUsers] = useState([]);
-    // const [users, setUsers] = useState(data);
+    // const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState(data);
 
     const [inputs, setInputs] = useState({
         id: 0,
@@ -102,18 +102,6 @@ function App() {
         });
     }
 
-    const onModify = (id) => {
-        for (const element of users) {
-            if (element.id === id) {
-                element.name = inputs.name;
-                element.lastName = inputs.lastName;
-                break;
-            }
-        }
-        setUsers([...users]);
-
-        console.log("users:",users);
-    }
 
     const delName = (id) => {
         let newUsers = users;
@@ -130,6 +118,52 @@ function App() {
         // })
     }
 
+    //수정 ver1
+    const onModify = (id) => {
+        for (const element of users) {
+            if (element.id === id) {
+                element.name = inputs.name;
+                element.lastName = inputs.lastName;
+                break;
+            }
+        }
+        setUsers([...users]);
+
+        console.log("users:",users);
+    }
+    //수정 ver2
+    const [updateToggle, setUpdateToggle] = useState(false);
+    //modify 버튼클릭시 UpdateUser에 클릭한 user 정보를 관리하는 state
+    const [selectedUser,setSelectedUser] = useState('');
+    const onUpdateToggle = ()=>{
+        setUpdateToggle(!updateToggle);
+    }
+
+    //선택한 user의 상태를 변경하는 함수
+    const onSelectUser = (user)=>{
+        console.log(user);
+        setSelectedUser(user);
+    }
+
+    const onUpdate = (value)=>{
+        // for (let user of users) {
+        //     if(user.id === selectedUser.id){
+        //         user.name = value;
+        //         break;
+        //     }
+        // }
+        // setUsers([...users]);
+        // setUpdateToggle(false);
+
+        //////////////////////////////////
+
+        users.map((user) =>
+            ((user.id === selectedUser.id ? user.name=value : user.name))
+        )
+
+        setUsers([...users]);
+        setUpdateToggle(false);
+    }
 
     return (
         <div>
@@ -139,8 +173,15 @@ function App() {
                 lastName={lastName}
                 onChange={onChange}
                 onAdd={onAdd}/>
-            <ListUser data={users} delName={delName} modify={onModify}/>
-            {/*  <Storage></Storage>*/}
+            <ListUser data={users}
+                      delName={delName}
+                      modify={onModify}
+                      onUpdateToggle={onUpdateToggle}
+                      onSelectUser={onSelectUser}
+            />
+
+            {updateToggle && <UpdateUser selectedUser={selectedUser} onUpdate={onUpdate}/>}
+              {/*<Storage></Storage>*/}
 
         </div>
     );

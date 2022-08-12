@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 
-function ListUser({data, delName, modify}){
+function ListUser({data, delName, modify, onUpdateToggle, onSelectUser}){
 
 
     return (
@@ -14,10 +14,13 @@ function ListUser({data, delName, modify}){
                     delName(ids.id)
                 }}>del</button>
                     <button onClick={()=>{
-                        modify(ids.id)
+                        // modify(ids.id);
+                        onUpdateToggle();
+                        onSelectUser(ids);
                     }}>modify</button>
                 </div>)
             })}
+
         </div>
     );
 }
